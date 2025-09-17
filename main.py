@@ -1,4 +1,6 @@
 import streamlit as st
+import altair as alt
+import pandas as pd
 import time 
 from classes import*
 from func import*
@@ -60,15 +62,83 @@ with courses_col2:
 if st.button("Calculate CWA", width=400):
     with st.spinner("Checking requirements..."):
         time.sleep(1)
-        if len(st.session_state.course_details)!=st.session_state.course_no:
-            st.error("Enter details for all courses first")
-            st.stop()
-        else:
-            st.success("Details accepted")
+        st.success("Details accepted")
     with st.spinner("Calculating..."):
         time.sleep(1)
-        new_cwa=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
+        new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
+        new_cwa=new_cwa_details[0]
     st.subheader(f"New CWA:  {round(new_cwa, 2)}")
+
+if st.checkbox("Graph Information"):
+    if 'new_cwa_details' in locals():
+        div1, div2= st.columns([1,1])
+        with div1:
+            # Raw names, stripping whitespace
+            raw_names = [course.name.strip() if course.name else "" 
+                        for course in st.session_state.course_details]
+
+            # If ALL names are blank -> auto-number all
+            if all(name == "" for name in raw_names):
+                display_names = [f"Course {i+1}" for i in range(len(raw_names))]
+            else:
+                display_names = raw_names   # keep them exactly as typed (blanks stay blank)
+                
+            df = pd.DataFrame({
+            "Course": display_names,
+            "Credits": [course.credits for course in st.session_state.course_details]
+            })
+            st.write("##### 📊 Course Influence on CWA (by Credits)")
+
+            chart = (
+                alt.Chart(df)
+                .mark_bar()
+                .encode(
+                    x=alt.X("Course:N", sort='-y', title="Course"),
+                    y=alt.Y("Credits:Q", title="Credit Hours"),
+                    color=alt.Color("Credits:Q", scale=alt.Scale(scheme="blues")),
+                    tooltip=["Course", "Credits"]
+                )
+                .properties(height=400)
+            )
+
+            st.altair_chart(chart, use_container_width=True)
+
+        with div2:
+            previous_total = st.session_state.p_cwa*float(st.session_state.c_credits)   # total credits before this semester
+            current_addition = new_cwa_details[1] # credits from current exams/semester
+
+            df_compare = pd.DataFrame({
+                "Category": ["Previous Total", "Current Addition"],
+                "Credits": [previous_total, current_addition]
+            })
+
+            st.write("##### 📈 Influence of current grades relative to previous")
+
+            chart_compare = (
+                alt.Chart(df_compare)
+                .mark_bar()
+                .encode(
+                    x=alt.X("Category:N", title=""),
+                    y=alt.Y("Credits:Q", title="Credits"),
+                    color=alt.Color("Category:N", scale=alt.Scale(scheme="set2")),
+                    tooltip=["Category", "Credits"]
+                )
+                .properties(height=400)
+            )
+
+            st.altair_chart(chart_compare, use_container_width=True)
+    else:
+        st.warning("Insufficient details")
+
+
+st.write("DEBUG", {
+    "course_no": st.session_state.get("course_no"),
+    "course_details": st.session_state.get('course_details', []),
+    "course_details_len": len(st.session_state.get("course_details", []))
+})
+
+
+
 
 
 
