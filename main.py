@@ -3,9 +3,9 @@ import time
 from classes import*
 from func import*
 
-st.set_page_config("CWA Calculator", layout="wide")
+st.set_page_config("🧮CWA Calculator", layout="wide")
 
-st.header("CWA Calculator", divider="blue")
+st.header("🧮CWA Calculator", divider="blue")
 
 initialize()
 
