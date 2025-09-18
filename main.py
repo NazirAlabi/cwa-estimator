@@ -131,11 +131,7 @@ if st.checkbox("Graph Information"):
         st.warning("Insufficient details")
 
 
-st.write("DEBUG", {
-    "course_no": st.session_state.get("course_no"),
-    "course_details": st.session_state.get('course_details', []),
-    "course_details_len": len(st.session_state.get("course_details", []))
-})
+
 
 
 
