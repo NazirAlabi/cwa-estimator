@@ -64,14 +64,15 @@ if st.button("Calculate CWA", width=400):
         time.sleep(1)
         if not all_inputs_empty(st.session_state.course_details):
             confirm=st.success("Details accepted", width=400)
+            with st.spinner("Calculating..."):
+                time.sleep(1)
+                st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
+                confirm.empty()
         else:
             warn=st.error("Insufficient Details", width=400)
             time.sleep(2)
             warn.empty()
-    with st.spinner("Calculating..."):
-        time.sleep(1)
-        st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
-        confirm.empty()
+
 
 st.write("---")
 if st.session_state.new_cwa_details[0]!=0:
