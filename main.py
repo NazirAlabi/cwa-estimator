@@ -66,7 +66,7 @@ if st.button("Calculate CWA", width=400):
     with st.spinner("Calculating..."):
         time.sleep(1)
         st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
-        confirm.clear()
+        confirm.empty()
 
 
 if st.session_state.new_cwa_details[0]!=0:
