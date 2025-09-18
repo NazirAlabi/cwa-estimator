@@ -123,8 +123,8 @@ if not all_inputs_empty(st.session_state.course_details):
                 for course in st.session_state.course_details:
                     current_addition+=float(course.score*course.credits) # credits from current exams/semester
                 df_compare = pd.DataFrame({
-                    "Category": ["All other semesters", "Last Semester"],
-                    "Credits": [previous_total, current_addition]
+                    "Category": ["All other Semesters", "Last Semester"],
+                    "Total": [previous_total, current_addition]
                 })
 
                 st.write("##### 📈 Influence of Last Semester Grades Relative To All Previous Ones")
@@ -134,9 +134,9 @@ if not all_inputs_empty(st.session_state.course_details):
                     .mark_bar()
                     .encode(
                         x=alt.X("Category:N", title=""),
-                        y=alt.Y("Credits:Q", title="Credits"),
+                        y=alt.Y("Total:Q", title="Total"),
                         color=alt.Color("Category:N", scale=alt.Scale(scheme="set2")),
-                        tooltip=["Category", "Credits"]
+                        tooltip=["Category", "Total"]
                     )
                     .properties(height=400)
                 )
