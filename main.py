@@ -135,7 +135,7 @@ if not all_inputs_empty(st.session_state.course_details):
 
                 st.altair_chart(chart, use_container_width=True)
 
-# Debuggig code
+# Debugging code
 # with st.expander("Debugging Info "):
 #     courses={}
 #     a=0
