@@ -5,7 +5,7 @@ import time
 from classes import*
 from func import*
 
-st.set_page_config("🧮CWA Calculator", layout="wide")
+st.set_page_config("🧮CWA Calculator", layout='wide')
 
 st.header("🧮CWA Calculator", divider="blue")
 
@@ -68,12 +68,16 @@ if st.button("Calculate CWA", width=400):
         st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
         confirm.empty()
 
-
+st.write("---")
 if st.session_state.new_cwa_details[0]!=0:
-    st.subheader(f"New CWA:  {round(st.session_state.new_cwa_details[0], 2)}")
+    st.subheader(f"New CWA:  {st.session_state.new_cwa_details[0]:.2f}")
+    with st.expander("Semester info", width=400):
+        st.write(f"##### Semester Weighted Average: {calculate_averages(st.session_state.course_details, True):.2f}")
+        st.write(f"##### Semester Unweighted Avrage: {calculate_averages(st.session_state.course_details, False):.2f}")
+        st.caption(f"{total_credits(st.session_state.course_details)} credits accross {st.session_state.course_no} courses")
+
 
 if st.checkbox("Graph Information"):
-    if 'new_cwa_details' in locals():
         div1, div2= st.columns([1,1])
         with div1:
             # Raw names, stripping whitespace
@@ -108,14 +112,15 @@ if st.checkbox("Graph Information"):
 
         with div2:
             previous_total = st.session_state.p_cwa*float(st.session_state.c_credits)   # total credits before this semester
-            current_addition = st.session_state.new_cwa_details[1] # credits from current exams/semester
-
+            current_addition = 0
+            for course in st.session_state.course_details:
+                current_addition+=float(course.score*course.credits) # credits from current exams/semester
             df_compare = pd.DataFrame({
-                "Category": ["Previous Total", "Current Addition"],
+                "Category": ["All other semesters", "Last Semester"],
                 "Credits": [previous_total, current_addition]
             })
 
-            st.write("##### 📈 Influence of current grades relative to previous")
+            st.write("##### 📈 Influence of Last Semester Grades Relative To All Previous Ones")
 
             chart_compare = (
                 alt.Chart(df_compare)
@@ -130,8 +135,7 @@ if st.checkbox("Graph Information"):
             )
 
             st.altair_chart(chart_compare, use_container_width=True)
-    else:
-        st.warning("Insufficient details")
+
 
 
 
