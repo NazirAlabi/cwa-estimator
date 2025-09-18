@@ -62,7 +62,7 @@ with courses_col2:
 if st.button("Calculate CWA", width=400):
     with st.spinner("Checking requirements..."):
         time.sleep(1)
-        st.success("Details accepted")
+        st.success("Details accepted", width=400)
     with st.spinner("Calculating..."):
         time.sleep(1)
         new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
