@@ -1,5 +1,5 @@
 import streamlit as st
-
+from classes import*
 # Initialize
 def initialize():
     if 'p_cwa' not in st.session_state:
@@ -59,6 +59,16 @@ def calculate_averages(course_details, value):
         unweighted_average=total/float(len(course_details))
         return (weighted_average,unweighted_average)
 
+# Check if all inputs are empty with course details list
+def all_inputs_empty(course_details):
+    """Return true if all values are the default values and False otherwise"""
+    for course in course_details:
+        if course.name=="" and course.score==70 and course.credits==1:
+            pass
+        else:
+            return False
+    return True
 
-
+# trial_cd=[Course("", 70, 1), Course("", 70, 1), Course("", 70, 1), Course("", 70, 1)]
+# print(all_inputs_empty(trial_cd))
 

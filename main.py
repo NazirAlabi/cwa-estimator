@@ -62,7 +62,12 @@ with courses_col2:
 if st.button("Calculate CWA", width=400):
     with st.spinner("Checking requirements..."):
         time.sleep(1)
-        confirm=st.success("Details accepted", width=400)
+        if not all_inputs_empty(st.session_state.course_details):
+            confirm=st.success("Details accepted", width=400)
+        else:
+            warn=st.error("Insufficient Details", width=400)
+            time.sleep(2)
+            warn.empty()
     with st.spinner("Calculating..."):
         time.sleep(1)
         st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
@@ -70,71 +75,82 @@ if st.button("Calculate CWA", width=400):
 
 st.write("---")
 if st.session_state.new_cwa_details[0]!=0:
-    st.subheader(f"New CWA:  {st.session_state.new_cwa_details[0]:.2f}")
-    with st.expander("Semester info", width=400):
-        st.write(f"##### Semester Weighted Average: {calculate_averages(st.session_state.course_details, True):.2f}")
-        st.write(f"##### Semester Unweighted Avrage: {calculate_averages(st.session_state.course_details, False):.2f}")
-        st.caption(f"{total_credits(st.session_state.course_details)} credits accross {st.session_state.course_no} courses")
+    st.subheader(f"New CWA:  {st.session_state.new_cwa_details[0]:.2f}", )
+    if not all_inputs_empty(st.session_state.course_details):
+        with st.expander("Semester info", width=400):
+            st.write(f"##### Semester Weighted Average: {calculate_averages(st.session_state.course_details, True):.2f}")
+            st.write(f"##### Semester Unweighted Avrage: {calculate_averages(st.session_state.course_details, False):.2f}")
+            st.caption(f"{total_credits(st.session_state.course_details)} credits accross {st.session_state.course_no} courses")
 
+if not all_inputs_empty(st.session_state.course_details):
+    if st.checkbox("Graph Information"):
+            div1, div2= st.columns([1,1])
+            with div1:
+                # Raw names, stripping whitespace
+                raw_names = [course.name.strip() if course.name else "" 
+                            for course in st.session_state.course_details]
 
-if st.checkbox("Graph Information"):
-        div1, div2= st.columns([1,1])
-        with div1:
-            # Raw names, stripping whitespace
-            raw_names = [course.name.strip() if course.name else "" 
-                        for course in st.session_state.course_details]
+                # If ALL names are blank -> auto-number all
+                if all(name == "" for name in raw_names):
+                    display_names = [f"Course {i+1}" for i in range(len(raw_names))]
+                else:
+                    display_names = raw_names   # keep them exactly as typed (blanks stay blank)
+                    
+                df = pd.DataFrame({
+                "Course": display_names,
+                "Credits": [course.credits for course in st.session_state.course_details]
+                })
+                st.write("##### 📊 Course Influence on CWA (by Credits)")
 
-            # If ALL names are blank -> auto-number all
-            if all(name == "" for name in raw_names):
-                display_names = [f"Course {i+1}" for i in range(len(raw_names))]
-            else:
-                display_names = raw_names   # keep them exactly as typed (blanks stay blank)
-                
-            df = pd.DataFrame({
-            "Course": display_names,
-            "Credits": [course.credits for course in st.session_state.course_details]
-            })
-            st.write("##### 📊 Course Influence on CWA (by Credits)")
-
-            chart = (
-                alt.Chart(df)
-                .mark_bar()
-                .encode(
-                    x=alt.X("Course:N", sort='-y', title="Course"),
-                    y=alt.Y("Credits:Q", title="Credit Hours"),
-                    color=alt.Color("Credits:Q", scale=alt.Scale(scheme="blues")),
-                    tooltip=["Course", "Credits"]
+                chart = (
+                    alt.Chart(df)
+                    .mark_bar()
+                    .encode(
+                        x=alt.X("Course:N", sort='-y', title="Course"),
+                        y=alt.Y("Credits:Q", title="Credit Hours"),
+                        color=alt.Color("Credits:Q", scale=alt.Scale(scheme="blues")),
+                        tooltip=["Course", "Credits"]
+                    )
+                    .properties(height=400)
                 )
-                .properties(height=400)
-            )
 
-            st.altair_chart(chart, use_container_width=True)
+                st.altair_chart(chart, use_container_width=True)
 
-        with div2:
-            previous_total = st.session_state.p_cwa*float(st.session_state.c_credits)   # total credits before this semester
-            current_addition = 0
-            for course in st.session_state.course_details:
-                current_addition+=float(course.score*course.credits) # credits from current exams/semester
-            df_compare = pd.DataFrame({
-                "Category": ["All other semesters", "Last Semester"],
-                "Credits": [previous_total, current_addition]
-            })
+            with div2:
+                previous_total = st.session_state.p_cwa*float(st.session_state.c_credits)   # total credits before this semester
+                current_addition = 0
+                for course in st.session_state.course_details:
+                    current_addition+=float(course.score*course.credits) # credits from current exams/semester
+                df_compare = pd.DataFrame({
+                    "Category": ["All other semesters", "Last Semester"],
+                    "Credits": [previous_total, current_addition]
+                })
 
-            st.write("##### 📈 Influence of Last Semester Grades Relative To All Previous Ones")
+                st.write("##### 📈 Influence of Last Semester Grades Relative To All Previous Ones")
 
-            chart_compare = (
-                alt.Chart(df_compare)
-                .mark_bar()
-                .encode(
-                    x=alt.X("Category:N", title=""),
-                    y=alt.Y("Credits:Q", title="Credits"),
-                    color=alt.Color("Category:N", scale=alt.Scale(scheme="set2")),
-                    tooltip=["Category", "Credits"]
+                chart_compare = (
+                    alt.Chart(df_compare)
+                    .mark_bar()
+                    .encode(
+                        x=alt.X("Category:N", title=""),
+                        y=alt.Y("Credits:Q", title="Credits"),
+                        color=alt.Color("Category:N", scale=alt.Scale(scheme="set2")),
+                        tooltip=["Category", "Credits"]
+                    )
+                    .properties(height=400)
                 )
-                .properties(height=400)
-            )
 
-            st.altair_chart(chart_compare, use_container_width=True)
+                st.altair_chart(chart_compare, use_container_width=True)
+
+# Debuggig code
+# with st.expander("Debugging Info "):
+#     courses={}
+#     a=0
+#     for course in st.session_state.course_details:
+#         a+=1
+#         courses[f'Course {a}']=[("Name", course.name), ("Score", course.score), ("Credits", course.credits)]
+#     st.write(courses)
+
 
 
 
