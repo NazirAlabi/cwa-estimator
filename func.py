@@ -11,7 +11,7 @@ def initialize():
     if 'course_details' not in st.session_state:
         st.session_state.course_details=[]
     if 'new_cwa' not in st.session_state:
-        st.session_state.new_cwa= "None"
+        st.session_state.new_cwa= 0
     st.session_state.course_details = []
 
 def calculate_cwa(previous_cwa: float, credits_finished: int, course_details_list: list):
