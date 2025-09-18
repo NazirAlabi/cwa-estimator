@@ -143,18 +143,3 @@ if not all_inputs_empty(st.session_state.course_details):
 #         a+=1
 #         courses[f'Course {a}']=[("Name", course.name), ("Score", course.score), ("Credits", course.credits)]
 #     st.write(courses)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
