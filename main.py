@@ -62,14 +62,15 @@ with courses_col2:
 if st.button("Calculate CWA", width=400):
     with st.spinner("Checking requirements..."):
         time.sleep(1)
-        st.success("Details accepted", width=400)
+        confirm=st.success("Details accepted", width=400)
     with st.spinner("Calculating..."):
         time.sleep(1)
-        new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
-        st.session_state.new_cwa=new_cwa_details[0]
+        st.session_state.new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
+        confirm.clear()
+
 
 if st.session_state.new_cwa!=0:
-    st.subheader(f"New CWA:  {round(st.session_state.new_cwa, 2)}")
+    st.subheader(f"New CWA:  {round(st.session_state.new_cwa_details[0], 2)}")
 
 if st.checkbox("Graph Information"):
     if 'new_cwa_details' in locals():
@@ -107,7 +108,7 @@ if st.checkbox("Graph Information"):
 
         with div2:
             previous_total = st.session_state.p_cwa*float(st.session_state.c_credits)   # total credits before this semester
-            current_addition = new_cwa_details[1] # credits from current exams/semester
+            current_addition = st.session_state.new_cwa_details[1] # credits from current exams/semester
 
             df_compare = pd.DataFrame({
                 "Category": ["Previous Total", "Current Addition"],
