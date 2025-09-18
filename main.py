@@ -69,7 +69,7 @@ if st.button("Calculate CWA", width=400):
         confirm.clear()
 
 
-if st.session_state.new_cwa!=0:
+if st.session_state.new_cwa_details[0]!=0:
     st.subheader(f"New CWA:  {round(st.session_state.new_cwa_details[0], 2)}")
 
 if st.checkbox("Graph Information"):
