@@ -66,8 +66,9 @@ if st.button("Calculate CWA", width=400):
     with st.spinner("Calculating..."):
         time.sleep(1)
         new_cwa_details=calculate_cwa(st.session_state.p_cwa, st.session_state.c_credits, st.session_state.course_details)
-        new_cwa=new_cwa_details[0]
-    st.subheader(f"New CWA:  {round(new_cwa, 2)}")
+        st.session_state.new_cwa=new_cwa_details[0]
+
+st.subheader(f"New CWA:  {round(st.session_state.new_cwa, 2)}")
 
 if st.checkbox("Graph Information"):
     if 'new_cwa_details' in locals():
